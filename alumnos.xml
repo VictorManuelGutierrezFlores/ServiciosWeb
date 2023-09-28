@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<definitions xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="urn:class_api" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="urn:class_api">
+<types>
+<xsd:schema targetNamespace="urn:class_api"
+>
+ <xsd:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+ <xsd:import namespace="http://schemas.xmlsoap.org/wsdl/" />
+ <xsd:complexType name="RespuestaBuscarAlumno">
+  <xsd:all>
+   <xsd:element name="code" type="xsd:string"/>
+   <xsd:element name="message" type="xsd:string"/>
+   <xsd:element name="data" type="xsd:string"/>
+   <xsd:element name="status" type="xsd:string"/>
+  </xsd:all>
+ </xsd:complexType>
+ <xsd:complexType name="RespuestaBienvenida">
+  <xsd:all>
+   <xsd:element name="code" type="xsd:string"/>
+   <xsd:element name="message" type="xsd:string"/>
+   <xsd:element name="status" type="xsd:string"/>
+  </xsd:all>
+ </xsd:complexType>
+ <xsd:complexType name="RespuestaEvaluarAlumno">
+  <xsd:all>
+   <xsd:element name="code" type="xsd:string"/>
+   <xsd:element name="message" type="xsd:string"/>
+   <xsd:element name="data" type="xsd:string"/>
+   <xsd:element name="promedio" type="xsd:float"/>
+   <xsd:element name="status" type="xsd:string"/>
+  </xsd:all>
+ </xsd:complexType>
+</xsd:schema>
+</types>
+<message name="BuscarAlumnoRequest">
+  <part name="user" type="xsd:string" />
+  <part name="pass" type="xsd:string" />
+  <part name="matricula" type="xsd:string" /></message>
+<message name="BuscarAlumnoResponse">
+  <part name="return" type="tns:RespuestaBuscarAlumno" /></message>
+<message name="BienvenidaRequest">
+  <part name="user" type="xsd:string" />
+  <part name="pass" type="xsd:string" />
+  <part name="matricula" type="xsd:string" /></message>
+<message name="BienvenidaResponse">
+  <part name="return" type="tns:RespuestaBienvenida" /></message>
+<message name="EvaluarAlumnoRequest">
+  <part name="user" type="xsd:string" />
+  <part name="pass" type="xsd:string" />
+  <part name="matricula" type="xsd:string" />
+  <part name="semestre" type="xsd:int" /></message>
+<message name="EvaluarAlumnoResponse">
+  <part name="return" type="tns:RespuestaEvaluarAlumno" /></message>
+<portType name="ClassroomWSPortType">
+  <operation name="BuscarAlumno">
+    <documentation>Operacion que devuelve el Nombre de un alumno dada su matricula.</documentation>
+    <input message="tns:BuscarAlumnoRequest"/>
+    <output message="tns:BuscarAlumnoResponse"/>
+  </operation>
+  <operation name="Bienvenida">
+    <documentation>Operacion que envía la Bienvenida a classroom al alumno.</documentation>
+    <input message="tns:BienvenidaRequest"/>
+    <output message="tns:BienvenidaResponse"/>
+  </operation>
+  <operation name="EvaluarAlumno">
+    <documentation>Operación que devuelve la calificación obtenida hasta el semestre N de un alumno dada su matricula.</documentation>
+    <input message="tns:EvaluarAlumnoRequest"/>
+    <output message="tns:EvaluarAlumnoResponse"/>
+  </operation>
+</portType>
+<binding name="ClassroomWSBinding" type="tns:ClassroomWSPortType">
+  <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+  <operation name="BuscarAlumno">
+    <soap:operation soapAction="urn:ClassroomWS#BuscarAlumno" style="rpc"/>
+    <input><soap:body use="encoded" namespace="urn:class_api" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+    <output><soap:body use="encoded" namespace="urn:class_api" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+  </operation>
+  <operation name="Bienvenida">
+    <soap:operation soapAction="urn:ClassroomWS#Bienvenida" style="rpc"/>
+    <input><soap:body use="encoded" namespace="urn:class_api" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+    <output><soap:body use="encoded" namespace="urn:class_api" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+  </operation>
+  <operation name="EvaluarAlumno">
+    <soap:operation soapAction="urn:ClassroomWS#EvaluarAlumno" style="rpc"/>
+    <input><soap:body use="encoded" namespace="urn:class_api" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+    <output><soap:body use="encoded" namespace="urn:class_api" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+  </operation>
+</binding>
+<service name="ClassroomWS">
+  <port name="ClassroomWSPort" binding="tns:ClassroomWSBinding">
+    <soap:address location="http://54.203.246.162/neo/classroom/sw/pruebasclase/alumnos.php"/>
+  </port>
+</service>
+</definitions>
