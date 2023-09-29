@@ -17,7 +17,8 @@ function read_document($project, $collection, $document) {
     return json_decode($response);
 }
 
-$proyecto = '<tu_proyecto>';
+
+$proyecto = 'productsws-f1161-default-rtdb';
 $coleccion = 'usuarios';
 
 $res = read_document($proyecto, $coleccion, 'pruebas1');

@@ -1,4 +1,7 @@
 <?php
+    // IMPORTACION DE LIBRERIA
+    include 'firebaseCRUD.php';
+
 	//header("Content-Type: text/xml; charset=UTF-8\r\n");
     ini_set("log_errors", 1);
     ini_set("error_log", "reportes/php-error-producto.log");
@@ -72,167 +75,37 @@
                         'Nos da una lista de detalles de cada producto.'  // Documentación o descripción del método
                      );
 
-    $productos = array(
-        'libros' => [
-            'LIB001' => 'Libro 1',
-            'LIB002' => 'Libro 2',
-            'LIB003' => 'Libro 3'
-        ],
-        'comics' => [
-            'COM001' => 'Comic 1',
-            'COM002' => 'Comic 2',
-            'COM003' => 'Comic 3'
-        ],
-        'mangas' => [
-            'MAN001' => 'Manga 1',
-            'MAN002' => 'Manga 2',
-            'MAN003' => 'Manga 3'
-        ]
-    );
-
-    $detalles = array(
-        'LIB001' => [
-            'Autor'     => 'Autor X',
-            'Nombre'    => 'Libro 1',
-            'Editorial' => 'Editorial X',
-            'Fecha'     => 2020,
-            'Precio'    => 0.00,
-            'Oferta'    => false
-        ],
-        'LIB002' => [
-            'Autor'     => 'Autor X',
-            'Nombre'    => 'Libro 2',
-            'Editorial' => 'Editorial Y',
-            'Fecha'     => 2020,
-            'Precio'    => 0.00,
-            'Oferta'    => false
-        ],
-        'LIB003' => [
-            'Autor'     => 'Autor X',
-            'Nombre'    => 'Libro 3',
-            'Editorial' => 'Editorial Z',
-            'Fecha'     => 2020,
-            'Precio'    => 0.00,
-            'Oferta'    => false
-        ],
-        'COM001' => [
-            'Autor'     => 'Autor X',
-            'Nombre'    => 'Comic 1',
-            'Editorial' => 'Editorial X',
-            'Fecha'     => 2020,
-            'Precio'    => 0.00,
-            'Oferta'    => false
-        ],
-        'COM002' => [
-            'Autor'     => 'Autor X',
-            'Nombre'    => 'Comic 2',
-            'Editorial' => 'Editorial Y',
-            'Fecha'     => 2020,
-            'Precio'    => 0.00,
-            'Oferta'    => false
-        ],
-        'COM003' => [
-            'Autor'     => 'Autor X',
-            'Nombre'    => 'Comic 3',
-            'Editorial' => 'Editorial Z',
-            'Fecha'     => 2020,
-            'Precio'    => 0.00,
-            'Oferta'    => false
-        ],
-        'MAN001' => [
-            'Autor'     => 'Autor X',
-            'Nombre'    => 'Manga 1',
-            'Editorial' => 'Editorial X',
-            'Fecha'     => 2020,
-            'Precio'    => 0.00,
-            'Oferta'    => false
-        ],
-        'MAN002' => [
-            'Autor'     => 'Autor X',
-            'Nombre'    => 'Manga 2',
-            'Editorial' => 'Editorial Y',
-            'Fecha'     => 2020,
-            'Precio'    => 0.00,
-            'Oferta'    => false
-        ],
-        'MAN003' => [
-            'Autor'     => 'Autor X',
-            'Nombre'    => 'Manga 3',
-            'Editorial' => 'Editorial Z',
-            'Fecha'     => 2020,
-            'Precio'    => 0.00,
-            'Oferta'    => false
-        ]
-    );
-
-    /**
-    NUEVO
-    **/
-    $respuestas = array(
-        200 => 'Categoria encontrada exitosamente.',
-        201 => 'ISBN encontrado exitosamente.',
-        300 => 'Categoria no encontrada.',
-        301 => 'ISBN no encontrado.',
-        500 => 'Usuario no reconocido.',
-        501 => 'Password no reconcido.',
-        999 => 'Error no idetificado'
-    );
-
-    /**
-    NUEVO
-    **/
-    $usuarios = array(
-        'pruebas1' => 'de88e3e4ab202d87754078cbb2df6063',
-        'pruebas2' => '6796ebbb111298d042de1a20a7b9b6eb',
-        'pruebas3' => 'f7e999012e3700d47e6cb8700ee9cf19',
-    );
-
     function getProd($user, $pass, $categoria) {
-        global $productos, $respuestas, $usuarios;
         $categoria = strtolower($categoria);
 
-        /**
-        NUEVO
-        **/
-        $resp = array(
-            'code'    => 999,
-            'message' => $respuestas[999],
-            'data'    => '',
-            'status'  => 'error'
-        );
 
-        if ( array_key_exists($user, $usuarios) ) {
-            if ( $usuarios[$user] === md5($pass) ) {
-                if ( array_key_exists($categoria, $productos) ) {
-                    $resp['code'] = 200;
-                    $resp['message'] = $respuestas[200];
-                    $resp['status'] = 'success';
-                    $resp['data'] = json_encode($productos[$categoria], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        if ( read_document('usuarios', $user) != NULL ) {
+            if ( read_document('usuarios', $user) === md5($pass) ) {
+                if ( read_document( 'productos',$categoria ) ) {
+                    $resp = json_encode( read_document( 'productos', $categoria ), JSON_PRETTY_PRINT );
+
                 }
                 else {
-                    $resp['code'] = 300;
-                    $resp['message'] = $respuestas[300];
+                    $resp = json_encode( read_document( 'repuestas', '300' ), JSON_PRETTY_PRINT );
+
                 }
             }
             else {
-                $resp['code'] = 501;
-                $resp['message'] = $respuestas[501];
+                $resp = json_encode( read_document( 'repuestas', '501' ), JSON_PRETTY_PRINT );
+
             }
         }
         else {
-            $resp['code'] = 500;
-            $resp['message'] = $respuestas[500];
-        }
+            $resp = json_encode( read_document( 'repuestas', '500' ), JSON_PRETTY_PRINT );
 
+        }
+        
         return $resp;
     }
 
-    function getDetails($user, $pass, $isbn) {
+    /**function getDetails($user, $pass, $isbn) {
         global $detalles, $respuestas, $usuarios;
 
-        /**
-        NUEVO
-        **/
         $resp = array(
             'code'    => 999,
             'message' => $respuestas[999],
@@ -266,7 +139,7 @@
         }
 
         return $resp;
-    }
+    }**/
   
     // Exposición del servicio (WSDL)
     //$data = !empty($HTTP_RAW_POST_DATA)?$HTTP_RAW_POST_DATA:'';

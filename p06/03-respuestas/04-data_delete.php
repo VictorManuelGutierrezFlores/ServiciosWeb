@@ -25,7 +25,7 @@ function delete_document($project, $collection, $document) {
     return $resBool;
 }
 
-$proyecto = '<tu_proyecto>';
+$proyecto = 'productsws-f1161-default-rtdb';
 $coleccion = 'respuestas';
 
 $res = delete_document($proyecto, $coleccion, '998');

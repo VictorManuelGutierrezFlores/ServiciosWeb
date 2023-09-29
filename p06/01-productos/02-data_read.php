@@ -17,7 +17,7 @@ function read_document($project, $collection, $document) {
     return json_decode($response);
 }
 
-$proyecto = '<tu_proyecto>';
+$proyecto = 'productsws-f1161-default-rtdb';
 $coleccion = 'productos';
 
 $res = read_document($proyecto, $coleccion, 'libros');
@@ -40,5 +40,3 @@ if(!is_null($res)) {
 } else {
     echo '<br>No se encontraron resultados<br>';
 }
-
-?>

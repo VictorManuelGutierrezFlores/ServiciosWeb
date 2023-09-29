@@ -23,7 +23,7 @@ function update_document($project, $collection, $document, $fields) {
     return json_decode($response);
 }
 
-$proyecto = '<tu_proyecto>';
+$proyecto = 'productsws-f1161-default-rtdb';
 $coleccion = 'detalles';
 
 $data = '{
