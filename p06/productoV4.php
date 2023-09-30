@@ -1,12 +1,10 @@
 <?php
-    // IMPORTACION DE LIBRERIA
-    include 'firebaseCRUD.php';
-
 	//header("Content-Type: text/xml; charset=UTF-8\r\n");
     ini_set("log_errors", 1);
     ini_set("error_log", "reportes/php-error-producto.log");
 
     require_once 'vendor/autoload.php';
+    require_once 'MyFirebase.php';
     //require_once 'nusoap/lib/nusoap.php';     //PHP v7.4.x o inferior
     
     $server = new soap_server();
@@ -61,7 +59,7 @@
                         'rpc',                                  // Estilo de comunicación (rpc|document)
                         'encoded',                              // Tipo de uso (encoded|literal)
                         'Nos da una lista de productos de cada categoría.'  // Documentación o descripción del método
-                     );
+    );
 
     $server->register( 'getDetails',                            // Nombre de la operación (método)
                         array('user' => 'xsd:string',
@@ -73,73 +71,88 @@
                         'rpc',                                  // Estilo de comunicación (rpc|document)
                         'encoded',                              // Tipo de uso (encoded|literal)
                         'Nos da una lista de detalles de cada producto.'  // Documentación o descripción del método
-                     );
+    );
 
     function getProd($user, $pass, $categoria) {
         $categoria = strtolower($categoria);
+        $FireObj = new MyFirebase('productsws-f1161-default-rtdb');
+        $response = array(
+            'code'    => '',
+            'message' => '',
+            'data'    => '',
+            'status'  => ''
+        );
 
-
-        if ( read_document('usuarios', $user) != NULL ) {
-            if ( read_document('usuarios', $user) === md5($pass) ) {
-                if ( read_document( 'productos',$categoria ) ) {
-                    $resp = json_encode( read_document( 'productos', $categoria ), JSON_PRETTY_PRINT );
-
+        if ( $FireObj->isUserInDB($user) ) {
+            if ( $FireObj->obtainPassword($user) == md5($pass) ) {
+                if (  $FireObj->isCategoryInDB($categoria) ) {
+                    $response['code'] = 200;
+                    $response['message'] = $FireObj->obtainMessages('200');
+                    $response['status'] = 'success';
+                    $response['data'] = $FireObj->obtainProducts($categoria) ;
                 }
                 else {
-                    $resp = json_encode( read_document( 'repuestas', '300' ), JSON_PRETTY_PRINT );
-
+                    // CATEGORIA NO EXISTENTE
+                    $response['code'] = 300;
+                    $response['message'] = $FireObj->obtainMessages('300');
                 }
             }
             else {
-                $resp = json_encode( read_document( 'repuestas', '501' ), JSON_PRETTY_PRINT );
-
+                // PASSWORD NO RECONCIDA
+                $response['code'] = 501;
+                $response['message'] = $FireObj->obtainMessages('501');
             }
         }
         else {
-            $resp = json_encode( read_document( 'repuestas', '500' ), JSON_PRETTY_PRINT );
-
+            //USUARIO NO RECONOCIDO
+            $response['code'] = 500;
+            $response['message'] = $FireObj->obtainMessages('500');
         }
         
-        return $resp;
+        return $response;
     }
 
-    /**function getDetails($user, $pass, $isbn) {
-        global $detalles, $respuestas, $usuarios;
-
+    function getDetails($user, $pass, $isbn) {
+        $FireObj = new MyFirebase('productsws-f1161-default-rtdb');
         $resp = array(
             'code'    => 999,
-            'message' => $respuestas[999],
+            'message' => '',
             'data'    => '',
             'status'  => 'error',
             'oferta'  => false
         );
 
-        if ( array_key_exists($user, $usuarios) ) {
-            if ( $usuarios[$user] === md5($pass) ) {
-                if ( array_key_exists($isbn, $detalles) ) {
+        if ( $FireObj->isUserInDB($user) ) {
+            if ( $FireObj->obtainPassword($user) == md5($pass) ) {
+                if ( $FireObj->isIsbnInDB($isbn) ) {
                     $resp['code'] = 201;
-                    $resp['message'] = $respuestas[201];
+                    $resp['message'] = $FireObj->obtainMessages('201');
                     $resp['status'] = 'success';
-                    $resp['data'] = json_encode($detalles[$isbn], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-                    $resp['oferta'] = $detalles[$isbn]['Oferta'];
+                    $resp['data'] = $FireObj->obtainDatails($isbn);
+                    $ispromo = json_decode($resp['data'], true);
+                    if( $ispromo['Descuento'] > 0){
+                        $resp['oferta'] = true;
+                    }else{
+                        $resp['oferta'] = false;
+                    }
                 }
                 else {
                     $resp['code'] = 301;
-                    $resp['message'] = $respuestas[301];
+                    $resp['message'] = $FireObj->obtainMessages('301');
                 }
             }
             else {
                 $resp['code'] = 501;
-                $resp['message'] = $respuestas[501];
+                $resp['message'] = $FireObj->obtainMessages('501');
             }
         }
         else {
             $resp['code'] = 500;
-            $resp['message'] = $respuestas[500];
+            $resp['message'] = $FireObj->obtainMessages('500');
         }
 
         return $resp;
-    }**/
+    }
   
     // Exposición del servicio (WSDL)
     //$data = !empty($HTTP_RAW_POST_DATA)?$HTTP_RAW_POST_DATA:'';
