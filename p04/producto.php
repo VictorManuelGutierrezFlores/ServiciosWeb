@@ -138,6 +138,21 @@
         'pruebas3' => 'f7e999012e3700d47e6cb8700ee9cf19', //12345678c
     );
 
+    $paqeuetes = array(
+        'paquete1'=>250,
+        'paquete2'=>400,
+        'paquete3'=>690,
+        'paquete4'=>1100,
+        'paquete5'=>1492,
+        'paquete6'=>2480,
+        'paquete7'=>7180,
+        'paquete8'=>7500,
+        'paquete9'=>13000,
+        'paquete10'=>36000,
+        'paquete11'=>50000,
+    );
+    
+
     /**
     *    REGISTRO DE OPERACIONES EN LA INTERFAZ DEL SERVICIO (WSDL)
     */
